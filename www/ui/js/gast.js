@@ -1,0 +1,1 @@
+var G = { version : '1.0.1', config : {"name":"GAST - Reggae Sun Ska","position":{"lat":"48.5632800","lng":"3.28355200"}} }

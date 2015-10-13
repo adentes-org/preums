@@ -1,0 +1,493 @@
+<style>
+    @media (min-width: 979px) {
+        body{
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    }
+    blockquote.pull-right {
+        padding: 19px;
+    }
+    blockquote{
+        min-width: 500px;
+    }
+    .table-striped img{
+        height:20px;
+        margin: 0px;
+    }
+    
+    .add-under{
+        background:#EEE;
+        padding: 3px !important;
+    }
+    .add-under:hover{
+        background:#DDD;
+    }
+    .btn-block{
+        margin-bottom: 20px;
+    }
+    #unit{
+        display: none;
+    }
+    #map {  
+        height: 400px; 
+        width: 100%;
+    }
+    
+    .nav li img{
+        display: none;
+    }
+    .nav li.active img{
+        display: inline-block;
+    	margin-top:4px;
+    	width:18px;
+    	float: right;
+    }
+    #info span{
+        width : 100px;
+    }
+    #info input{
+        width : 180px;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12 well">
+<center>
+<div class="input-append" style="width: 90%; margin-bottom: -2px;margin-left: -65px;">
+  <input class="span12" style="width: 100%;" id="localisation" type="text" >
+  <button id="local_submit" class="btn btn-info" type="button">Valider</button>
+</div>
+</center>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">Unité</li>
+                    {{*
+                    <li class="active"><a href="#">Unit 1</a></li>
+                    <li><a href="#">Unit 2</a></li>
+                    <li><a href="#">Unit 3</a></li>
+                    <li class="nav-header">Victimes</li>
+                    <li><a href="#">Victimes 1337</a></li>
+                    <li><a href="#">Victimes 1338</a></li>
+                    *}}            
+                </ul>
+                <br>
+                <a id="add_unit" class="btn btn-block btn-primary">Ajouter</a>
+            </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+            <div class="hero-unit">
+                <div id="unit" class="row-fluid">
+                    <div class="span5">
+                        <form class="well">
+                            <h2></h2>
+                            <p class="muted"><small>last update : <span  id="update" class="">10:04:05</span></small></p>
+                            <br>
+                            <div id="info" class="row-fluid">
+                                <div class="input-prepend">
+                                    <span class="add-on span3">UUID </span>
+                                    <input id="uuid"   type="text" id="prependedInput"  class="span9" readonly>
+                                </div>
+                                <div class="input-prepend">
+                                    <span class="add-on span3">Status </span>
+                                    <input id="status" data-action='editable' data-ref='status' type="text" id="prependedInput" class="span9">
+                                </div>
+                                <div class="input-prepend">
+                                    <span class="add-on span3">Selectif radio </span>
+                                    <input id="radio" data-action='editable' data-ref='radio' type="text" id="prependedInput"  class="span9">
+                                </div>
+                                <div class="input-prepend">
+                                    <span  class="add-on span3">Position </span>
+                                    <input id="coords" type="text" id="prependedInput" class="span9" readonly>>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="span6 offset1">
+                        <table class="table table-striped well">
+                            <thead>
+                                <tr>
+                                    {{*<th>#</th>*}}
+                                    <th>Prénom</th>
+                                    <th>Nom</th>
+                                    <th>Niveau</th>
+                                    <th>Numéro</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="membres">
+                                {{*
+                                <tr>
+                                    <td>1</td>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>PSC-1</td>
+                                    <td><img src="/ui/img/edit.png"/></td>
+                                </tr>
+                                *}}
+                                <tr>
+                                    <td class="add-under" colspan="5"><center>+</center></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <a class="btn btn-large btn-block btn-primary">Localiser</a>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12" id="messages">
+                            {{*
+                            <blockquote class="pull-right well">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                                <small>Someone famous <cite title="Source Title">Source Title</cite></small>
+                            </blockquote>
+                            <blockquote class="pull-left well">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                                <small>Someone famous <cite title="Source Title">Source Title</cite></small>
+                            </blockquote>
+                            *}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/span-->
+    </div><!--/row-->
+    <div id="locateModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="locateModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="locateModalLabel">Localiser :</h3>
+        </div>
+        <div class="modal-body">
+            <div id="map"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="valid-position" class="btn btn-primary">Save changes</button>
+        </div>
+    </div>
+    <div id="addModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="addModalLabel">Ajouter une unit.</h3>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label" for="uuid">UUID</label>
+                <div class="controls">
+                  <input type="text" id="uuid" placeholder="@unit">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="name">Nom</label>
+                <div class="controls">
+                  <input type="text" id="name" placeholder="">
+                </div>
+              </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="valid-add" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+    <div id="addmembresModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addmembresModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="addmembresModalLabel">Ajouter un membre.</h3>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label" for="prenom">Prénom</label>
+                <div class="controls">
+                  <input type="text" id="prenom" placeholder="Antoine">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="nom">Nom</label>
+                <div class="controls">
+                  <input type="text" id="nom" placeholder="GIRARD">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="niveau">NIVEAU</label>
+                <div class="controls">
+                  <input type="text" id="niveau" placeholder="PSC-1">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="numero">Numéro</label>
+                <div class="controls">
+                  <input type="text" id="numero" placeholder="0663234256">
+                </div>
+              </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="valid-add-membre" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+
+<script>
+    G.regie = {
+        units: {},
+        init : function(){
+            $("#localisation").val(JSON.stringify(G.config.position));
+
+            $("#local_submit").on("click", function(){
+              G.config.position = JSON.parse($("#localisation").val());
+                $.post("/config", G.config,function(d){
+                      window.location.reload();
+                });
+            });
+
+            $("#add_unit").on("click", function(){ 
+                $('#addModal').modal('show');
+            })
+            
+            $("#membres").on("click","img", function(){ 
+                console.log($(this).attr('data-key'));
+                G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres.splice($(this).attr('data-key'),1);
+                G.regie.save();
+                //$('#membres').append('<tr><td>Mark</td><td>Otto</td><td>PSC-1</td><td><img src="/ui/img/edit.png"/></td></tr>');
+            });
+            $("body").on("click",".add-under", function(){ 
+                console.log("ajout membres");
+                $('#addmembresModal').modal('show');
+                
+                //$('#membres').append('<tr><td>Mark</td><td>Otto</td><td>PSC-1</td><td><img src="/ui/img/edit.png"/></td></tr>');
+            });
+            
+            
+            $("#valid-add-membre").on("click", function(){ 
+                $('#addmembresModal').modal('hide');
+                if(typeof G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres == "undefined")
+                   G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres = new Array();
+                G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres.push({
+                    prenom:$("#addmembresModal #prenom").val(),
+                    nom:$("#addmembresModal #nom").val(),
+                    niveau:$("#addmembresModal #niveau").val(),
+                    numero:$("#addmembresModal #numero").val()
+                });
+                
+                G.regie.save();
+            })
+                   
+            $("#valid-add").on("click", function(){ 
+                $('#addModal').modal('hide');
+	            $.post("/unit/update",{
+                    "uuid" : '@'+$("#addModal #uuid").val() ,
+                    "name" : $("#addModal #name").val(), 
+                    "coords" : G.config.position,
+                    "update" : (new Date()).getTime(),
+                    "status" : "Nouveau",
+                    "membres":  new Array()}, function(data){
+	                window.location.reload();
+	            }).error(function() { 
+	                alert("Une érreur à été détecter pour  éviter tous problème la page va ce recharger!"); 
+	                window.location.reload(); 
+            	});
+            })
+            $("#unit .btn-block").on("click", function(){ 
+                $('#locateModal').modal('show');
+                setTimeout('G.regie.init_map()',300); 
+            })
+            $("#valid-position").on("click", function(){ 
+                $('#locateModal').modal('hide');
+                G.regie.units[$(".nav-list li.active>a").attr('data-key')].coords.lng = G.regie.marker.getLatLng().lng;
+                G.regie.units[$(".nav-list li.active>a").attr('data-key')].coords.lat = G.regie.marker.getLatLng().lat;
+                //G.regie.units[$(".nav-list li.active>a").attr('data-key')].coords =  G.regie.marker.getLatLng();
+                G.regie.save();
+                $(".nav-list li.active>a").click();
+            })
+            $(".nav-list").on("click","li>img", function(e){ 
+            	if (confirm("Supprimer ?")){
+                    var d = G.regie.units[$(this).next("a[data-type='unit']").attr('data-key') ]
+                    //alert(d.uuid);
+                    $.post("/unit/delete",{"uuid" : d.uuid  },function(data){
+    	                window.location.reload();
+    	            }).error(function() { 
+    	                alert("Une érreur à été détecter pour  éviter tous problème la page va ce recharger!"); 
+    	                window.location.reload(); 
+                	});
+            	}
+            });
+            $(".nav-list").on("click","li>a[data-type='unit']", function(e){ 
+                //console.log(typeof(e.originalEvent));// == "undefined" if not real click
+                var d = G.regie.units[$(this).attr('data-key')]
+                if(!$(this).parent().hasClass('active')){
+                    //alert("new tab !");
+                    $(".nav-list li").removeClass('active');
+                    $(this).parent().addClass('active');
+                    console.log(d);
+                    $("#unit h2").text(d.name)
+                    $("#locateModalLabel").text("Localiser :"+d.name)
+                    $("#unit #update").text((new Date(d.update)).toISOString());
+                    //console.log((new Date()).getTime());
+                    $("#unit #uuid").val(d.uuid);
+                    //console.log($("#unit #status:focus").length)
+                    
+                    if(typeof(e.originalEvent)!="undefined" || $("#unit #status:focus").length == 0)
+                        $("#unit #status").val(d.status);
+                      
+                    if(typeof(e.originalEvent)!="undefined" || $("#unit #radio:focus").length == 0)
+                        $("#unit #radio").val(d.radio);
+                    
+                    $("#unit #coords").val(JSON.stringify(d.coords));
+                    
+                    
+                    var _html = "";
+                    
+                    if ( typeof d.membres != "undefined"){
+                    $.each(d.membres, function(key, val) {
+                        _html += '<tr><td>'+val.prenom+'</td><td>'+val.nom+'</td><td>'+val.niveau+'</td><td>'+val.numero+'</td><td><img data-key="'+key+'" src="/ui/img/delete.png"/></td></tr>';
+                    });
+                    }
+                
+                    _html += '<tr><td class="add-under" colspan="5"><center>+</center></td></tr>';
+                    $('#unit #membres').html(_html);
+                    
+                    var _html = "";
+                    
+                    if ( typeof d.messages != "undefined"){
+                    $.each(d.messages, function(key, val) {
+                        if(val.from == "Super")
+                            _html += '<blockquote class="pull-right well"><p>'+val.message+'</p><small>'+val.from+' @ '+val.date+'</small></blockquote>';
+                        else
+                            _html += '<blockquote class="pull-left well"><p>'+val.message+'</p><small>'+val.from+' @ '+val.date+'</small></blockquote>';
+                    });
+                    }
+                    $('#unit #messages').html(_html);
+                    $("#unit").show();
+                }else{
+                    if($("#unit h2").text()!=d.name)
+                        $("#unit h2").text(d.name);
+                        
+                    if($("#locateModalLabel").text()!="Localiser :"+d.name)
+                        $("#locateModalLabel").text("Localiser :"+d.name);
+                        
+                    
+                    if($("#unit #update").text()!=(new Date(d.update)).toISOString())    
+                        $("#unit #update").text((new Date(d.update)).toISOString());
+                    
+                    if($("#unit #uuid").val()!=d.uuid)
+                        $("#unit #uuid").val(d.uuid);
+                    
+                    if($("#unit #status").val()!=d.status && $("#unit #status:focus").length == 0)
+                        $("#unit #status").val(d.status);
+                        
+                    if(typeof(e.originalEvent)!="undefined" || $("#unit #radio:focus").length == 0)
+                        $("#unit #radio").val(d.radio);
+                    
+                    if($("#unit #coords").val()!=JSON.stringify(d.coords))
+                        $("#unit #coords").val(JSON.stringify(d.coords));
+                    
+                    var _html = "";
+                    if ( typeof d.membres != "undefined"){
+                    $.each(d.membres, function(key, val) {
+                        _html += '<tr><td>'+val.prenom+'</td><td>'+val.nom+'</td><td>'+val.niveau+'</td><td>'+val.numero+'</td><td><img data-key="'+key+'" src="/ui/img/delete.png"/></td></tr>';
+                    });
+                    }
+                    
+                    _html += '<tr><td class="add-under" colspan="5"><center>+</center></td></tr>';
+                    
+                    if($('#unit #membres').html()!=_html)
+                        $('#unit #membres').html(_html);
+                    
+                    var _html = "";
+                    
+                    if ( typeof d.messages != "undefined"){
+                    $.each(d.messages, function(key, val) {
+                        if(val.from == "Super")
+                            _html += '<blockquote class="pull-right well"><p>'+val.message+'</p><small>'+val.from+' @ '+val.date+'</small></blockquote>';
+                        else
+                            _html += '<blockquote class="pull-left well"><p>'+val.message+'</p><small>'+val.from+' @ '+val.date+'</small></blockquote>';
+                    });
+                    }
+                    if($('#unit #messages').html()!=_html)
+                        $('#unit #messages').html(_html);
+                }
+                
+                if( ( (new Date()).getTime() - d.update ) > 15*60*1000 ){
+                    $("#unit #update").attr("class","text-error");
+                }
+            } );
+            $("#unit").on("change","input[data-action='editable']", function(){ 
+                G.regie.units[G.regie.active()][$(this).attr("data-ref")] = $(this).val();
+                console.log(G.regie.units[G.regie.active()]);
+                G.regie.save();
+            });
+            G.regie.update();
+        },
+        
+        init_map : function(){
+            var d = G.regie.units[$(".nav-list li.active>a").attr('data-key')];
+            G.regie.map = L.map('map').setView(d.coords, 17);
+            
+            //L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
+            L.tileLayer('/tile/{z}/{x}-{y}.png', {
+                maxZoom: 18
+            }).addTo(G.regie.map);
+            G.regie.marker = L.marker(d.coords,{title:d.name,draggable:true}).addTo(G.regie.map);
+        },
+        
+        save : function(){
+            G.regie.units[G.regie.active()].update =  (new Date()).getTime();
+            $.post("/unit/update",G.regie.units[G.regie.active()],function(data){
+                console.log(data);
+            })
+        },
+        
+        active : function(){
+            return $(".nav-list li.active>a").attr('data-key');
+        },
+        
+        update : function(){
+            $.get("/db/units.json?"+(new Date()).getTime(),function(data){
+                
+                //$('.nav-list').html('<li class="nav-header">Unité</li>')
+                $(".nav-list li>a[data-key]").parent().addClass("toremove");
+                $.each(data, function(key, val) {
+                    if(typeof(G.regie.units[key])=='undefined'){
+                        $('.nav-list').append('<li><img src="/ui/img/delete.png"/><a data-type="unit" data-key="'+key+'" href="#">'+val.name+'</a></li>');
+                    }
+                    data[key].update = parseInt(data[key].update);
+                    $(".nav-list li>a[data-key='"+key+"']").parent().removeClass("toremove");
+                        /*
+                        $(".nav-list li>a[data-key='"+key+"']"
+                        if($(".nav-list li.active>a[data-key='"+key+"']").length==0)
+                             $(".nav-list li>a[data-key='"+key+"']").remove();
+                        else
+                            window.location.reload();
+                        */
+                });
+                
+                if($(".nav-list li.toremove").is(".active"))
+                    window.location.reload();
+                else
+                    $(".nav-list li.toremove").remove();
+                
+                if($(".nav-list li.active>a").length == 0){
+                    G.regie.units = data;
+                    $(".nav-list li>a").eq(0).click();
+                }
+                else{
+                    G.regie.units = data;
+                    $(".nav-list li.active>a").click();
+                }
+                setTimeout("G.regie.update()", 5000);
+            },"json").error(function() { 
+                alert("Une érreur à été détecter pour  éviter tous problème la page va ce recharger!"); 
+                window.location.reload(); 
+            });
+        }
+    }
+    G.regie.init();
+</script>

@@ -1,0 +1,68 @@
+	 <style>
+      @media (min-width: 979px) {
+          body{
+     			padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+          }
+      }
+    #timeline h4.media-heading{
+        margin-bottom : 15px;      
+    }
+    #timeline span {
+        float : right
+    }
+    #timeline span.green{
+        color : #96CA2D !important;
+    }
+    #timeline span.grey{
+        color : grey !important;
+    }
+    #timeline span.blue{
+        color : #046380 !important;
+    }
+    #timeline span.red{
+        color : #B9121B !important;
+    }
+    #timeline li.media {
+        
+    }
+    #timeline .media-body{
+        padding-bottom: 4px;
+        border-bottom: 1px solid #999;
+    }
+    #timeline .time {
+        float: right;
+        /*margin: -10px 0px 2px;*/
+        margin-top: 10px;
+font-size: 12px;
+
+    }
+    </style>
+    <div id="timeline" class="container">
+    <ul class="media-list">
+    </ul>        
+    </div>
+    <script>
+        
+        G.journal = {
+            "message" : {
+                
+                "db" :{},
+                "update" : function(){
+                    
+                    $.get('/db/messages.json?'+(new Date()).getTime(), function(data) {
+                        
+                        $.each(data, function(key, val) {
+                            if(typeof(G.journal.message.db[key])=='undefined'){
+                                G.journal.message.db[key] = val;
+                                $("#timeline .media-list").prepend('<li class="media"><div class="media-body"><h4 class="media-heading">'+val.from+' > '+val.to+' <span class="'+G.res.status[val.status_id].color+'" >'+G.res.status[val.status_id].msg+'</span></h4>'+val.content+'<div class="time">'+(new Date(parseInt(val.at))).toLocaleString()+'</div></div></li>');
+                            }
+                        });
+                        
+                        setTimeout("G.journal.message.update()", 5000);
+                    });
+                    
+                }
+            }
+            
+        };G.journal.message.update();
+    </script>

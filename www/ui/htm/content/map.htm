@@ -1,0 +1,371 @@
+<style>
+    body {
+        padding: 40px 0 0 0;
+        border:0;
+        margin:0;
+    }
+    #map {  
+        width:80%; 
+        height: 82%; 
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        float :right;
+    }
+    #timeline {
+        background: #222;
+        height: 100%;
+        width: 20%;
+        }
+    #top{   
+        background: #ccc;
+        height: 18%;
+        width: 80%;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+    #top>div{
+        margin-top: 46px;
+        margin-left : 20px;
+    }
+    #top .dropdown-menu {
+        right: 0;
+        left:initial;
+        width: 245px;
+    }
+    #top #message{
+        width: 99%;
+    }
+    #top input{
+        height: 30px;
+    }
+    #top>div>button {
+        height: 30px;
+        margin-right: 12px;
+        float: right;
+        width: 120px;
+    }
+    #top .input-append {
+        margin-right:15px;
+    }
+    li.green>a,input.green{
+        background : #96CA2D !important;
+    }
+    li.grey>a,input.grey{
+        color : #DDD;
+        background : grey !important;
+    }
+    li.blue>a,input.blue{
+        color : #DDD;
+        background : #046380 !important;
+    }
+    li.red>a,input.red{
+        color : #DDD;
+        background : #B9121B !important;
+    }
+    p.green{
+        color : #96CA2D !important;
+    }
+    p.grey{
+        color : grey !important;
+    }
+    p.blue{
+        color : #046380 !important;
+    }
+    p.red{
+        color : #B9121B !important;
+    }
+    #timeline{
+       /* margin-top: 55px; */
+        overflow-y: auto;
+    }
+    #timeline h4 {
+        color: #DDD;
+        font-size: 16px;    
+    }
+    #timeline li.media {
+        color: #BBB;
+        padding: 10px 8px 5px 8px;
+        margin : 0;
+    }
+    #timeline .media-body{
+        padding-bottom: 4px;
+        border-bottom: 1px solid #999;
+    }
+    #timeline .media p{
+        margin: -7px 0px 0px;
+        font-size: 12.5px
+    }
+    #timeline ul {
+        min-height: 20px;
+    }
+
+    @media (max-width: 979px) {
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+        .navbar-fixed-top{
+            margin-bottom: 0px;
+        }
+        #timeline,#top{
+            display : none;
+        }
+        #map {   
+            position: relative;
+            top: 0px;
+            bottom: 0px;
+            width: 100%; 
+        }
+    }
+    @media (max-width: 767px) {
+        body .navbar-fixed-top {
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+    }
+    .popup .time{
+        float: right;
+        margin-top: -16px;
+        font-size: 11px;
+    }
+    .popup .status{
+        font-size: 14px;
+    }
+    
+</style>
+
+<div id="timeline">
+    <ul class="media-list">
+    </ul>
+</div>
+<div id="top">
+<div>
+<div class="input-append unit">
+  <input id="unit_to" placeholder="unit_to" type="text" readonly>
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" data-toggle="dropdown">
+      &nbsp;
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+    </ul>
+  </div>
+</div>
+<div class="input-append unit">
+  <input id="unit_from" placeholder="unit_from" type="text" readonly>
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" data-toggle="dropdown">
+      &nbsp;
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+    </ul>
+  </div>
+</div>
+<div class="input-append status">
+  <input id="status" placeholder="status" type="text" readonly>
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" data-toggle="dropdown">
+      &nbsp;
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+    </ul>
+  </div>
+</div>
+<button onclick="G.map.valider_message();">Envoyer</button>
+  <br>
+  <input type="text" id="message" placeholder="Message">
+  
+</div>  
+</div>
+<div id="map"></div>
+
+<!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />-->
+<!--<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>-->
+<script>
+    if($(document).width()<980)
+        $("#map").css("height",($(document).height()-10)+"px" );
+    G.map ={
+        "init" : function(){
+            console.log(G.config.position);
+            G.map.map = L.map('map').setView(G.config.position, 16);
+            L.tileLayer('/tile-{z}-{x}-{y}', {
+                minZoom: 12,
+                maxZoom: 20
+            }).addTo(G.map.map);
+//Plan detaaillé            G.res.img.plan_global().addTo(G.map.map);
+            $.each(G.res.status, function(key, val) {
+                $("#top .status .dropdown-menu").append("<li class='"+val.color+"' data-id='"+key+"'><a>"+val.msg+"</a></li>");
+            });
+            G.map.unit.update();
+            G.map.message.update();
+            
+            $("#top .dropdown-menu").on("click","li", function(e){ 
+                    //alert($(this).parent().parent().html());
+                    var el = $(this).parent().parent().parent().find("input");
+                    el.val($(this).text())
+                    el.attr("data-id",$(this).attr("data-id"));
+                    el.attr("class",$(this).attr("class"));
+            });
+        },
+        "message" : {
+            
+            "db" :{},
+            "update" : function(){
+                
+                $.get('/db/messages.json?'+(new Date()).getTime(), function(data) {
+                    
+                    $.each(data, function(key, val) {
+                        if(typeof(G.map.message.db[key])=='undefined'){
+                            G.map.message.db[key] = val;
+                            $("#timeline .media-list").prepend('<li class="media"><div class="media-body"><h4 class="media-heading">'+val.from+' > '+val.to+'</h4><p class="'+G.res.status[val.status_id].color+'" >'+G.res.status[val.status_id].msg+'</p>'+val.content+'</div></li>');
+                        }
+                    });
+                    
+                    setTimeout("G.map.message.update()", 7000);
+                });
+                
+            }
+        },
+        "unit" : {
+            "db" :{},
+            "update" : function(){
+                $.get('/db/units.json?'+(new Date()).getTime(), function(data) {
+                    $.each(G.map.unit.db, function(key, val) {
+                        if(typeof(data[key])=='undefined'){
+                            G.map.map.removeLayer(G.map.unit.db[key].marker);
+                            delete G.map.unit.db[key];
+                        }
+                    });
+                    $.each(data, function(key, val) {
+                        if(typeof(G.map.unit.db[key])=='undefined'){
+                            console.log('add '+key+" point");
+                            val.key = key;
+                            $("#top .unit .dropdown-menu").append("<li data-id='"+key+"'><a>"+val.uuid+"</a></li>");
+                            G.map.unit.db[key] = val;	
+                            G.map.unit.db[key].marker = L.marker([val.coords.lat, val.coords.lng],{title:key,draggable:true}).addTo(G.map.map);
+                            G.map.unit.db[key].marker.bindPopup(G.res.tmpl.info_bulle(val));
+                            G.map.unit.db[key].marker.isdragged = false;
+                            G.map.unit.db[key].marker.key = key;
+                            
+                            G.map.unit.db[key].marker.on("dragstart",function(e){
+                                this.isdragged=true;
+                                this.closePopup();
+                            })
+                            G.map.unit.db[key].marker.on("dragend",function(e){
+                                this.isdragged=false;
+                                if (confirm("Valider ?")) { 
+                                    G.map.unit.db[this.key].coords = {lat : e.target._latlng.lat, lng : e.target._latlng.lng};
+                                    G.map.unit.db[this.key].update = (new Date()).getTime();
+                                    $.post("/unit/update",{
+                                        uuid: G.map.unit.db[this.key].uuid,
+                                        coords: G.map.unit.db[this.key].coords,
+                                        update: G.map.unit.db[this.key].update+1
+                                    },function(data){
+                                        console.log(data);
+                                    })
+                                }
+                                var val = G.map.unit.db[this.key];
+                                G.map.unit.db[this.key].marker.setLatLng(val.coords);
+                                G.map.unit.db[this.key].marker.update();
+                                //console.log(e);
+                            })
+                        }
+                        else if(G.map.unit.db[key].update<val.update){
+                            // TODO upd te seulement si différence d'objet
+                            //console.log(G.map.unit.db[key].update);
+                            //console.log(val.update);
+                            console.log('update '+key+" point");
+                            //console.log(G.map.unit.db[key].update);
+                            //console.log(val.update);
+                            G.map.unit.db[key].coords =  val.coords;
+                            G.map.unit.db[key].status =  val.status;
+                            G.map.unit.db[key].status_id =  val.status_id;
+                            G.map.unit.db[key].update =  val.update;
+                            G.map.unit.db[key].marker.closePopup();
+                            G.map.unit.db[key].marker.bindPopup(G.res.tmpl.info_bulle(val));
+                            //G.map.unit.db[key].marker.togglePopup()
+                            if(!G.map.unit.db[key].marker.isdragged){
+                                G.map.unit.db[key].marker.setLatLng(val.coords);
+                                G.map.unit.db[key].marker.update();
+                            }
+                        }
+                        
+
+                        
+                        if(typeof(G.map.unit.db[key].status_id)!='undefined' && typeof(G.res.status[G.map.unit.db[key].status_id] )!='undefined' ){
+                            //console.log(G.res.status[G.map.unit.db[key].status_id].color+"_out");
+                            //console.log(G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"]);
+                            if( ( (new Date()).getTime() - parseInt(val.update) ) > 15*60*1000 && typeof(G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"])!='undefined'){
+                                G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"]);
+                            }else{
+                                G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color]);
+                            }
+                        }
+                        else if( ( (new Date()).getTime() - parseInt(val.update) ) > 15*60*1000 ) {
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human.grey);
+                        }
+                        else /*if(val.status=="" || typeof(val.status)=='undefined')*/{
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human.green);
+                        }
+                        /*
+                        else if(typeof(G.res.icon.Human[val.status])!='undefined'){
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[val.status]);
+                        }else{
+                            console.log("status  unknown : " + val.status);
+                        }*/
+                    });
+                    setTimeout("G.map.unit.update()", 7000);
+                },"json").error(function() { 
+                   // alert("Une erreur à été détectée pour  éviter tout problème la page va se recharger!"); 
+                    window.location.reload(); 
+                });
+            }
+        },
+        valider_message  : function(){
+            //TODO
+            if (typeof $("#unit_from").attr('data-id')=="undefined" || typeof $("#unit_to").attr('data-id')=="undefined" || typeof $("#status").attr('data-id')=="undefined" ){
+                alert('Veuillez saisir tous les champs obligatoires.');
+                return;
+            }
+            key = $("#unit_from").attr('data-id');
+            G.map.unit.db[key].status = $("#status").val();
+            G.map.unit.db[key].status_id = $("#status").attr('data-id');
+            G.map.unit.db[key].update = (new Date()).getTime();
+            var data ={
+                uuid: G.map.unit.db[key].uuid,
+                status_id: G.map.unit.db[key].status_id,
+                status: G.map.unit.db[key].status,
+                update: G.map.unit.db[key].update+1,
+                message : {
+                    from : G.map.unit.db[$("#unit_from").attr('data-id')].uuid,
+                    to : G.map.unit.db[$("#unit_to").attr('data-id')].uuid,
+                    status_id: $("#status").attr('data-id'),
+                    content : $("#message").val(),
+                    at :  (new Date()).getTime()
+                }
+            };
+            
+            if(typeof(G.res.status[$("#status").attr('data-id')].position)!='undefined'){
+                data.coords = G.res.status[$("#status").attr('data-id')].position;
+                data.coords.lat = data.coords.lat + (Math.random()-0.5)/5000;
+                data.coords.lng = data.coords.lng + (Math.random()-0.5)/5000;
+            }
+            
+            $.post("/unit/update",data ,function(data){
+               console.log(data);
+            });
+            
+            $("#top input").val('');
+            $("#top input").removeAttr("data-id");
+            $("#top #status").removeAttr("class");
+            
+        }
+    }
+    G.map.init();
+</script>
+

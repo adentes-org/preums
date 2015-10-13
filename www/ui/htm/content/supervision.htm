@@ -1,0 +1,386 @@
+<style>
+    body {
+        padding: 40px 0 0 0;
+        border:0;
+        margin:0;
+    }
+    #map {  
+        width:80%; 
+        height: 87%; 
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        float :right;
+    }
+    #timeline {
+        background: #222;
+        height: 100%;
+        width: 20%;
+        }
+    #top{   
+        background: #ccc;
+        height: 13%;
+        width: 80%;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+    #top>div{
+        margin-top:10px;
+        margin-left : 20px;
+    }
+    #top .dropdown-menu {
+        right: 0;
+        left:initial;
+        width: 245px;
+    }
+    #top #message{
+        width: 99%;
+    }
+    #top input{
+        height: 30px;
+    }
+    #top>div>button {
+        height: 30px;
+        margin-right: 12px;
+        float: right;
+        width: 120px;
+    }
+    #top .input-append {
+        margin-right:15px;
+    }
+    li.green>a,input.green{
+        background : #96CA2D !important;
+    }
+    li.grey>a,input.grey{
+        color : #DDD;
+        background : grey !important;
+    }
+    li.blue>a,input.blue{
+        color : #DDD;
+        background : #046380 !important;
+    }
+    li.red>a,input.red{
+        color : #DDD;
+        background : #B9121B !important;
+    }
+    p.green{
+        color : #96CA2D !important;
+    }
+    p.grey{
+        color : grey !important;
+    }
+    p.blue{
+        color : #046380 !important;
+    }
+    p.red{
+        color : #B9121B !important;
+    }
+    #timeline{
+        /* margin-top: 55px; */
+        overflow-y: auto;
+    }
+    #timeline h4 {
+        color: #DDD;
+        font-size: 16px;    
+    }
+    #timeline li.media {
+        color: #BBB;
+        padding: 10px 8px 5px 8px;
+        margin : 0;
+    }
+    #timeline .media-body{
+        padding-bottom: 4px;
+        border-bottom: 1px solid #999;
+    }
+    #timeline .media p{
+        margin: -7px 0px 0px;
+        font-size: 12.5px
+    }
+    #timeline>ul {
+        min-height: 20px;
+    }
+    #timeline .time {
+        float: right;
+        /*margin: -10px 0px 2px;*/
+        margin-top: 10px;
+font-size: 11px;
+
+    }
+
+    .popup .time{
+        float: right;
+        margin-top: -16px;
+        font-size: 11px;
+    }
+    .popup .status{
+        font-size: 14px;
+    }
+    @media (max-width: 979px) {
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+        .navbar-fixed-top{
+            margin-bottom: 0px;
+        }
+        #timeline,#top{
+            display : none;
+        }
+        #map {   
+            position: relative;
+            top: 0px;
+            bottom: 0px;
+            width: 100%; 
+        }
+    }
+    @media (max-width: 767px) {
+        body .navbar-fixed-top {
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+    }
+    .navbar {
+        display: none;
+    }
+    body {
+        padding: 0;
+        border:0;
+        margin:0;
+    }
+    #top div{
+        display:inline-block;
+    }
+    #top .indicateur{
+        padding: 5px 0px 5px 10px;
+        background: #EEE;
+        border: 1px solid #444;
+        border-radius: 5px;
+    }
+    #top .indicateur>div{
+        margin-left:7px;
+        padding: 0px 10px;
+        border-left: 1px solid #444;
+    }
+    
+    /*RPi */
+    #top .indicateur{
+        margin-top: 10px;
+        font-size: 230%;
+        padding: 10px 0px 10px 15px;
+        border: 2px solid #444;
+        border-radius: 10px;
+    }
+    #top .indicateur>div{
+        margin-left:10px;
+        padding: 0px 13px;
+        border-left: 2px solid #444;
+    }
+    #timeline h4 {
+         font-size: 115%;
+         margin: 10px 0px 15px 0;
+    }
+    #timeline .media p {
+        margin: 10px 0px 5px;
+        font-size: 100%;
+    }
+    #timeline .media-body {
+         font-size: 180%;
+    }
+    /**/
+</style>
+
+<div scrollamount="1" truespeed  direction="up" id="timeline">
+    <ul class="media-list">
+    </ul>
+</div>
+<div id="top">
+    <div class="indicateur">Inter en Cours<div id="inter_en_cours">0</div></div>
+    <div class="indicateur">Prises en charge en cours<div id="pec_en_cours">0</div></div>
+    <div class="indicateur">Evacs en cours<div id="evac_en_cours">0</div></div>
+    <br>
+    <div class="indicateur">Inter réalisées<div id="depart_inter">0</div></div>
+    <div class="indicateur">Prises en charge réalisées<div id="pec_realises">0</div></div>
+    <div class="indicateur">Evacs réalisées<div id="evac_realises">0</div></div>
+</div>
+<div id="map"></div>
+
+<!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />-->
+<!--<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>-->
+<script>
+    if($(document).width()<980)
+        $("#map").css("height",($(document).height()-10)+"px" );
+    G.map ={
+        "init" : function(){
+            console.log(G.config.position);
+            G.map.map = L.map('map').setView(G.config.position, 16);
+            L.tileLayer('/tile/{z}/{x}-{y}.png', {
+                minZoom: 12,
+                maxZoom: 20
+            }).addTo(G.map.map);
+            G.res.img.plan_global().addTo(G.map.map);
+            G.map.unit.update();
+            G.map.message.update();
+        },
+        "stat" : {
+            "inter_en_cours" : 0,
+            //not (evac dispo patrouille indispo retsans) en ce moment
+            "depart_inter" : 0,
+            //depinter depuis le début
+            "pec_realises" : 0,
+            //pecvicti depuis le début
+            "pec_en_cours" : 0,
+            //pecvicti retvicti renfcrf renfmed en ce moment
+            "evac_en_cours" : 0,
+            //evac en ce moement
+            "evac_realises" : 0
+            //evac depuis le début
+        },
+        "message" : {
+            
+            "db" :{},
+            "update" : function(){
+                
+                $.get('/db/messages.json?'+(new Date()).getTime(), function(data) {
+                    
+                    $.each(data, function(key, val) {
+                        if(typeof(G.map.message.db[key])=='undefined'){
+                               
+                            switch(val.status_id)
+                            {
+                            case "depinter":
+                                G.map.stat.depart_inter++;
+                               //$("#nb_inter").text( 1 + parseInt($("#nb_inter").text()));
+                              break;
+                            case "pecvicti":
+                                G.map.stat.pec_realises++;
+                               //$("#nb_prise_en_charge").text( 1 + parseInt($("#nb_prise_en_charge").text()));
+                            case "evac":
+                                G.map.stat.evac_realises++;
+                               //$("#nb_evac").text( 1 + parseInt($("#nb_evac").text()));
+                              break;
+                            default:
+                            }   
+                            G.map.message.db[key] = val;     
+                            /* Fait après le calcul des unités
+                            $.each(G.map.stat, function(key, val) {
+                                $("#"+key).text(val);
+                            });
+                            */
+                        }
+                    });
+                    
+                    setTimeout("G.map.message.update()", 15000);
+                });
+                
+            }
+        },
+        "unit" : {
+            "db" :{},
+            "update" : function(){
+                $.get('/db/units.json?'+(new Date()).getTime(), function(data) {
+                    $.each(G.map.unit.db, function(key, val) {
+                        if(typeof(data[key])=='undefined'){
+                            G.map.map.removeLayer(G.map.unit.db[key].marker);
+                            delete G.map.unit.db[key];
+                        }
+                    });
+                    G.map.stat.pec_en_cours = 0;
+                    G.map.stat.evac_en_cours = 0;
+                    G.map.stat.inter_en_cours = 0;
+                    $.each(data, function(key, val) {
+                        if(typeof(G.map.unit.db[key])=='undefined'){
+                            console.log('add '+key+" point");
+                            val.key = key;
+                               
+                            $("#timeline .media-list").prepend('<li class="media" id="'+key+'"><div class="media-body"><h4 class="media-heading">'+val.uuid+'</h4><p class="'+((val.status_id)?G.res.status[val.status_id].color:'')+'" >'+((val.status_id)?G.res.status[val.status_id].msg:'Nouveau')+'</p>'+''+'</div></li>');
+                            G.map.unit.db[key] = val;	
+                            G.map.unit.db[key].marker = L.marker([val.coords.lat, val.coords.lng],{title:key,draggable:false}).addTo(G.map.map);
+                            G.map.unit.db[key].marker.bindPopup(G.res.tmpl.info_bulle(val));
+                            G.map.unit.db[key].marker.key = key;
+                        
+                        }
+                        else if(G.map.unit.db[key].update<val.update){
+                            // TODO update seulement si différence d'objet
+                            //console.log(G.map.unit.db[key].update);
+                            //console.log(val.update);
+                            $("#timeline #"+key).html('<div class="media-body"><h4 class="media-heading">'+val.uuid+'</h4><p class="'+((val.status_id)?G.res.status[val.status_id].color:'')+'" >'+((val.status_id)?G.res.status[val.status_id].msg:'Nouveau')+'</p>'+''+'</div>');
+ 
+                            console.log('update '+key+" point");
+                            G.map.unit.db[key].coords =  val.coords;
+                            G.map.unit.db[key].status =  val.status;
+                            G.map.unit.db[key].status_id =  val.status_id;
+                            G.map.unit.db[key].update =  val.update;
+                            /*
+                            G.map.unit.db[key].marker.bindPopup("_id : " + key +
+                                "<br>uuid : " + val.uuid +
+                                "<br>position : " + val.coords.lat + " , " + val.coords.lng+
+                                "<br>timestamp : " + (new Date(parseInt(val.update))).toLocaleString() +
+                                "<br>status : " + val.status);
+                                */
+                            G.map.unit.db[key].marker.closePopup()
+                            G.map.unit.db[key].marker.bindPopup(G.res.tmpl.info_bulle(val));
+                            G.map.unit.db[key].marker.setLatLng(val.coords);
+                            G.map.unit.db[key].marker.update();
+                        }
+                        
+
+                        
+                        if(typeof(G.map.unit.db[key].status_id)!='undefined' && typeof(G.res.status[G.map.unit.db[key].status_id] )!='undefined' ){
+                            //console.log(G.res.status[G.map.unit.db[key].status_id].color+"_out");
+                            //console.log(G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"]);
+                            if( ( (new Date()).getTime() - parseInt(val.update) ) > 15*60*1000 && typeof(G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"])!='undefined'){
+                                G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color+"_out"]);
+                            }else{
+                                G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[G.res.status[G.map.unit.db[key].status_id].color]);
+                            }
+                        }
+                        else if( ( (new Date()).getTime() - parseInt(val.update) ) > 15*60*1000 ) {
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human.grey);
+                        }
+                        else /*if(val.status=="" || typeof(val.status)=='undefined')*/{
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human.green);
+                        }
+                        /*
+                        else if(typeof(G.res.icon.Human[val.status])!='undefined'){
+                            G.map.unit.db[key].marker.setIcon(new G.res.icon.Human[val.status]);
+                        }else{
+                            console.log("status  unknown : " + val.status);
+                        }*/
+                        
+                        //Calcul des stats sur le status actuel
+                        switch(G.map.unit.db[key].status_id){
+                            case "pecvicti":
+                            case "retvicti":
+                            case "renfcrf":
+                            case "renfmed":
+                                G.map.stat.pec_en_cours++;
+                            break;
+                            case "evac":
+                                G.map.stat.evac_en_cours++;
+                            break;
+                            default : 
+                                if(typeof G.map.unit.db[key].status_id!="undefined" && G.map.unit.db[key].status_id!="evac" && G.map.unit.db[key].status_id!="dispo" && G.map.unit.db[key].status_id!="patrouille" && G.map.unit.db[key].status_id!="indispo" && G.map.unit.db[key].status_id!="retsans")
+                                    G.map.stat.inter_en_cours++;
+                            break;
+                        }
+                        
+                        
+                    });
+                    
+                    $.each(G.map.stat, function(key, val) {
+                       $("#"+key).text(val);
+                    });
+                    setTimeout("G.map.unit.update()", 15000);
+                },"json").error(function() { 
+                   // alert("Une érreur à été détecter pour  éviter tous problème la page va ce recharger!"); 
+                    window.location.reload(); 
+                });
+            }
+        }
+    }
+    G.map.init();
+</script>
+
+
