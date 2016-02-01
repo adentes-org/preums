@@ -215,7 +215,7 @@ font-size: 11px;
         "init" : function(){
             console.log(G.config.position);
             G.map.map = L.map('map').setView(G.config.position, 16);
-            L.tileLayer('/tile/{z}/{x}-{y}.png', {
+            L.tileLayer('/tile-{z}-{x}-{y}', {
                 minZoom: 12,
                 maxZoom: 20
             }).addTo(G.map.map);
