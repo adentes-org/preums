@@ -33,6 +33,7 @@ G.res = {
 		},
         status : {
            "dispo" : { color : "green", msg : "Disponible a la base", position : {lat: 45.21824521, lng: -0.74869304} },
+           "dispohorsbase" : { color : "green", msg : "Disponible" },
            "depinter" :  { color : "blue", msg : "Part en intervention" },
            "retsans" :  { color : "blue", msg : "Victime laissée sur place" },
            "codevert" :  { color : "blue", msg : "Pas de victime" },
