@@ -432,7 +432,7 @@
             G.regie.map = L.map('map').setView(d.coords, 17);
             
             //L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
-            L.tileLayer('/tile/{z}/{x}-{y}.png', {
+            L.tileLayer('/tile-{z}-{x}-{y}', {
                 maxZoom: 18
             }).addTo(G.regie.map);
             G.regie.marker = L.marker(d.coords,{title:d.name,draggable:true}).addTo(G.regie.map);
