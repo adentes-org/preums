@@ -32,7 +32,7 @@ G.res = {
     	    }   
 		},
         status : {
-           "dispo" : { color : "green", msg : "Disponible a la base", position : {lat: 45.21824521, lng: -0.74869304} },
+           "dispo" : { color : "green", msg : "Disponible a la base", position : G.config.position },
            "dispohorsbase" : { color : "green", msg : "Disponible" },
            "depinter" :  { color : "blue", msg : "Part en intervention" },
            "retsans" :  { color : "blue", msg : "Victime laissée sur place" },
@@ -47,8 +47,8 @@ G.res = {
             "renfmed" :  { color : "red", msg : "Demande renfort Medicalisé" },
            "renfencad" :  { color : "red", msg : "Demande presence Encadrement" },
            "bilan" :  { color : "red", msg : "Passe bilan victime" },
-           "evac" :  { color : "red", msg : "Evacue une victime" , position : {lat: 45.210064, lng: -0.759075} },
-           "indispo" :  { color : "grey", msg : "A la base, indisponible", position : {lat: 45.223564, lng: -0.747075}  },
+           "evac" :  { color : "red", msg : "Evacue une victime" , position : G.config.position },
+           "indispo" :  { color : "grey", msg : "A la base, indisponible", position : G.config.position },
             },
 		item : { 
 			unit : {},
