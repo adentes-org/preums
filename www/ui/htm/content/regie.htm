@@ -436,6 +436,7 @@
                 maxZoom: 18
             }).addTo(G.regie.map);
             G.regie.marker = L.marker(d.coords,{title:d.name,draggable:true}).addTo(G.regie.map);
+            G.regie.marker.setIcon(new L.icon({ iconUrl: 'ui/img/marker-icon.png',  iconSize: [25, 41]}));
         },
         
         save : function(){
