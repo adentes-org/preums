@@ -254,8 +254,12 @@
             
             $("#membres").on("click","img", function(){ 
                 console.log($(this).attr('data-key'));
-                G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres.splice($(this).attr('data-key'),1);
-                G.regie.save();
+								if(G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres.length > 1){
+                	G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres.splice($(this).attr('data-key'),1);
+                }else{
+									G.regie.units[$(".nav-list li.active>a").attr('data-key')].membres = [];
+								}
+								G.regie.save();
                 //$('#membres').append('<tr><td>Mark</td><td>Otto</td><td>PSC-1</td><td><img src="/ui/img/edit.png"/></td></tr>');
             });
             $("body").on("click",".add-under", function(){ 
